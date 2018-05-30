@@ -1,54 +1,49 @@
 #!/usr/bin/env python3
 from c4lib.board import Board
 from c4lib.randomBot import RandomBot
-#from lib.randomBot import *
+from c4lib.humanPlayer import HumanPlayer
+from c4lib.colours import Colours
 
-print("\nConnect 4 by Quentin Serrurier\n")
+def getPlayOrder(playerNum):
+    if (playerNum==1): return '1st'
+    else: return '2nd'
+
+print("\nConnect 4 by Quentin\n")
 # We instantiate the board and then invite players to play on it
 board = Board()
-randomBot1 = RandomBot(1, board)
-randomBot2 = RandomBot(2, board)
+players = [ HumanPlayer(1, board), RandomBot(2, board) ]
 
+# Win detection can be tested by:
+# board.makeMove(1,1)
+# board.makeMove(2,1)
+# board.makeMove(1,1)
+# board.makeMove(1,1)
+# board.makeMove(1,1)
+# board.makeMove(2,2)
+# board.makeMove(1,2)
+# board.makeMove(1,2)
+# board.makeMove(1,3)
+# board.makeMove(1,3)
+# board.renderBoard()
+# board.setDebug(True)
+# board.makeMove(1,4)
+
+activePlayer = 1
+moveNum = 0
 while (board.winState==0):
-    randomBot1.makeMove()
-    if (board.winState!=0): break
-    randomBot2.makeMove()
-if (board.winState>0):
-    (winningRow, winningCol) = board.winningMove
-    print(" Player {} wins by playing col: {}, row: {} for a {} line.".format(board.winState, winningCol+1, winningRow+1, board.winningMoveType))
-elif (board.winState==-1): print("The game has tied")
+    board.renderBoard()
+    activePlayer = not activePlayer
+    players[activePlayer].makeMove()
+    print(" Player {} moved in column {}.".format(players[activePlayer].getName(),board.getLastMove()))
+    moveNum = moveNum + 1
+
 
 board.renderBoard()
-
-
-# columns are zero based
-# board.makeMove(1, 5)
-# board.makeMove(2, 5)
-# board.makeMove(1, 5)
-# board.makeMove(2, 3)
-# board.makeMove(1, 4)
-# board.makeMove(2, 3)
-# board.makeMove(1, 4)
-# board.makeMove(2, 4)
-# board.makeMove(1, 4)
-# board.makeMove(2, 3)
-# board.makeMove(1, 3)
-# board.makeMove(2, 2)
-# board.makeMove(1, 3)
-# board.makeMove(2, 4)
-# board.makeMove(1, 3)
-# board.makeMove(2, 4)
-# board.makeMove(1, 2)
-# board.makeMove(2, 2)
-# board.makeMove(1, 1)
-# board.makeMove(2, 2)
-# board.makeMove(1, 0)
-# board.makeMove(2, 1)
-# board.makeMove(1, 1)
-# board.makeMove(2, 6)
-# board.makeMove(1, 6)
-#board.setDebug(True)
-#print(board.getLegalMoves())
-
-# print("Playing {} in column {}".format(playerNum, colNum+1))
-# print("board: ")
+if (board.winState>0):
+    (winningRow, winningCol) = board.winningMove
+    winningMoveTypeString = board.winningMoveType
+    if (winningMoveTypeString[0] in 'aeiou'): winningMoveTypeString = "an "+winningMoveTypeString
+    else: winningMoveTypeString="a "+winningMoveTypeString
+    print(" {} playing {} ".format(players[board.winState-1].getName(), getPlayOrder(board.winState))+Colours.BLUE+"wins"+Colours.CLEAR+" by playing col: "+Colours.BOLD+Colours.BLUE+"{}".format(winningCol+1)+Colours.CLEAR+", row: "+Colours.BOLD+Colours.BLUE+"{}".format(winningRow+1)+Colours.CLEAR+" with {} line.".format(winningMoveTypeString))
+elif (board.winState==-1): print("The game has tied")
+print("\n")

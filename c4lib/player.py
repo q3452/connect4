@@ -6,3 +6,6 @@ class Player:
 
     def makeMove(self):
         pass
+
+    def getName():
+        pass

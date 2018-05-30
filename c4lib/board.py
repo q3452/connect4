@@ -1,17 +1,9 @@
-class Colours:
-    PURPLE = '\033[95m'
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    CLEAR = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+from .colours import Colours
 
-class MoveTypes:
-    vertical = 'upwards'
-    upwards = 'up-right'
-    downwards = 'down-right'
+class MoveTypes: # from left to right direction
+    vertical = 'vertical'
+    upwards = 'ascending'
+    downwards = 'descending'
     horizontal = 'horizontal'
 
 class Board:
@@ -25,8 +17,15 @@ class Board:
         self.winningMove = (-1,-1)
         self.winningMoveType = ''
         self.debug = False
+        self.moveLog = []
     def setDebug(self, debug):
         self.debug = debug
+    def getMoveNum(self, moveNum):
+        return self.moveLog[moveNum]
+    def getLastMove(self):
+        if len(self.moveLog)>0:
+            return self.moveLog[-1]['colNum']
+        else: raise Exception("Someone is requesting the last move when there are no moves yet.")
 
     def makeMove(self, playerNum, colNum):
         if (self.winState != 0): raise ValueError("Player {} is attempting to move when the game is already won by player {}.".format(playerNum, self.winState))
@@ -36,6 +35,7 @@ class Board:
         if (len(self.columns[colNum])>5): raise ValueError("The move attempted to play in a full column ({}).".format(colNum))
         # We seem to have a valid move.
         self.columns[colNum].append(playerNum)
+        self.moveLog.append({'playerNum': playerNum, 'colNum': colNum})
         self.checkForWin()
         if (self.winState != 0):
             self.winningMove = (len(self.columns[colNum])-1, colNum);
@@ -83,15 +83,15 @@ class Board:
         #   (zero based) and just check for vertical lines in those columns.
         for rowNum in range(0, 6):
             for colNum in range(0,7):
-                if (self.checkUpwardsLine(rowNum,colNum)):
+                if (self.checkVerticalLine(rowNum,colNum)):
                     self.winningMoveType = MoveTypes.vertical
                     self.winningMove=(rowNum,colNum)
                     self.winState = self.getPlayerPieceAt(rowNum,colNum)
-                if (self.checkUpRightLine(rowNum,colNum)):
+                if (self.checkUpwardsLine(rowNum,colNum)):
                     self.winningMoveType = MoveTypes.upwards
                     self.winningMove=(rowNum,colNum)
                     self.winState = self.getPlayerPieceAt(rowNum,colNum)
-                if (self.checkDownRightLine(rowNum,colNum)):
+                if (self.checkDownwardsLine(rowNum,colNum)):
                     self.winningMoveType = MoveTypes.downwards
                     self.winningMove=(rowNum,colNum)
                     self.winState = self.getPlayerPieceAt(rowNum,colNum)
@@ -102,7 +102,7 @@ class Board:
         if (self.winState==0 and len(self.getLegalMoves()) == 0): self.winState = -1 # Stalemate
         return self.winState
 
-    def checkUpwardsLine(self, rowNum, colNum):
+    def checkVerticalLine(self, rowNum, colNum):
         if (rowNum>= 3): return False # there isn't enough space for a four line
         column = self.columns[colNum]
         if (len(column) != (rowNum+4)): return False # A winning move from this slot will require the column height to be rowNum+4
@@ -111,7 +111,7 @@ class Board:
         for i in range(rowNum+1,rowNum+4):
             if (column[i]!=playerNum): return False
         return True;
-    def checkUpRightLine(self, rowNum, colNum):
+    def checkUpwardsLine(self, rowNum, colNum):
         if (rowNum>= 3): return False # there isn't enough space for a four line
         if (colNum>= 4): return False # there isn't enough space for a four line
         playerNum = self.getPlayerPieceAt(rowNum, colNum)
@@ -119,8 +119,8 @@ class Board:
         for i in range(1,4):
             if (self.getPlayerPieceAt(rowNum+i, colNum+i)!=playerNum): return False
         return True;
-    def checkDownRightLine(self, rowNum, colNum):
-        if (rowNum<= 3): return False # there isn't enough space for a four line
+    def checkDownwardsLine(self, rowNum, colNum):
+        if (rowNum<= 2): return False # there isn't enough space for a four line
         if (colNum>= 4): return False # there isn't enough space for a four line
         playerNum = self.getPlayerPieceAt(rowNum, colNum)
         if (playerNum==0): return False
