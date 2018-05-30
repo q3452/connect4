@@ -7,7 +7,7 @@ from c4lib.humanPlayer import HumanPlayer
 class TestBoard(unittest.TestCase):
     def setUp(self):
         self.board = Board()
-        
+
     # test horizontal line win condition at either side of the board
     def test_horizontalWinCondition1(self):
         self.assertTrue(self.board.winState == 0)
@@ -155,6 +155,53 @@ class TestBoard(unittest.TestCase):
         # check that a move will raise an exception after the game is won
         with self.assertRaises(Exception):
             self.board.makeMove(1,'9')
+            
+    def test_tieCondition(self):
+        self.assertTrue(self.board.winState == 0)
+        self.board.makeMove(2,0)
+        self.board.makeMove(1,0)
+        self.board.makeMove(2,0)
+        self.board.makeMove(1,0)
+        self.board.makeMove(2,0)
+        self.board.makeMove(1,0)
+        self.board.makeMove(2,1)
+        self.board.makeMove(1,1)
+        self.board.makeMove(2,1)
+        self.board.makeMove(1,1)
+        self.board.makeMove(2,1)
+        self.board.makeMove(1,1)
+        self.board.makeMove(2,2)
+        self.board.makeMove(1,2)
+        self.board.makeMove(2,2)
+        self.board.makeMove(1,2)
+        self.board.makeMove(2,2)
+        self.board.makeMove(1,2)
+        self.board.makeMove(1,3)
+        self.board.makeMove(2,3)
+        self.board.makeMove(1,3)
+        self.board.makeMove(2,3)
+        self.board.makeMove(1,3)
+        self.board.makeMove(2,3)
+        self.board.makeMove(2,4)
+        self.board.makeMove(1,4)
+        self.board.makeMove(2,4)
+        self.board.makeMove(1,4)
+        self.board.makeMove(2,4)
+        self.board.makeMove(1,4)
+        self.board.makeMove(2,5)
+        self.board.makeMove(1,5)
+        self.board.makeMove(2,5)
+        self.board.makeMove(1,5)
+        self.board.makeMove(2,5)
+        self.board.makeMove(1,5)
+        self.board.makeMove(2,6)
+        self.board.makeMove(1,6)
+        self.board.makeMove(2,6)
+        self.board.makeMove(1,6)
+        self.board.makeMove(2,6)
+        self.assertTrue(self.board.winState == 0)
+        self.board.makeMove(1,6)
+        self.assertTrue(self.board.winState == -1)
 
 if __name__ == '__main__':
     unittest.main()

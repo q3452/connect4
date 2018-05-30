@@ -11,8 +11,9 @@ def getPlayOrder(playerNum):
 print("\nConnect 4 by Quentin\n")
 # We instantiate the board and then invite players to play on it
 board = Board()
-players = [ HumanPlayer(1, board), RandomBot(2, board) ]
+players = [ RandomBot(1, board), RandomBot(2, board) ]
 
+# The game loop is here, we toggle the active player rather than performing both turns in the same loop
 activePlayer = 1
 moveNum = 0
 while (board.winState==0):
@@ -21,7 +22,6 @@ while (board.winState==0):
     players[activePlayer].makeMove()
     print(" Player {} moved in column {}.".format(players[activePlayer].getName(),board.getLastMove()))
     moveNum = moveNum + 1
-
 
 board.renderBoard()
 if (board.winState>0):
