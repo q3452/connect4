@@ -16,10 +16,7 @@ class Board:
         self.winState = 0
         self.winningMove = (-1,-1)
         self.winningMoveType = ''
-        self.debug = False
         self.moveLog = []
-    def setDebug(self, debug):
-        self.debug = debug
     def getMoveNum(self, moveNum):
         return self.moveLog[moveNum]
     def getLastMove(self):

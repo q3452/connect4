@@ -13,21 +13,6 @@ print("\nConnect 4 by Quentin\n")
 board = Board()
 players = [ HumanPlayer(1, board), RandomBot(2, board) ]
 
-# Win detection can be tested by:
-# board.makeMove(1,1)
-# board.makeMove(2,1)
-# board.makeMove(1,1)
-# board.makeMove(1,1)
-# board.makeMove(1,1)
-# board.makeMove(2,2)
-# board.makeMove(1,2)
-# board.makeMove(1,2)
-# board.makeMove(1,3)
-# board.makeMove(1,3)
-# board.renderBoard()
-# board.setDebug(True)
-# board.makeMove(1,4)
-
 activePlayer = 1
 moveNum = 0
 while (board.winState==0):
