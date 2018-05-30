@@ -1,0 +1,117 @@
+class colours:
+    PURPLE = '\033[95m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    CLEAR = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+class Board:
+    # Initializer / Instance Attributes
+    def __init__(self):
+        # Initialise the board, a sparse representation allows for a few optimisations at the expense of checking array lengths here and there
+        self.columns = [
+            [],[],[],[],[],[],[]
+        ]
+        self.winState = 0
+    
+    def makeMove(self, playerNum, colNum):
+        if (self.winState != 0): raise ValueError("Player {} is attempting to move when the game is already won by player {}.".format(playerNum, self.winState))
+        if (playerNum != 1 and playerNum != 2): raise ValueError("An invalid player was selected")
+        if (type(colNum) != int): raise ValueError("The board didn't understand the requested move ({}).".format(colNum))
+        if (colNum<0 or colNum>6): raise ValueError("An invalid column was requested ({}).".format(colNum))
+        if (len(self.columns[colNum])>5): raise ValueError("The move attempted to play in a full column ({}).".format(colNum))
+        # We seem to have a valid move.
+        self.columns[colNum].append(playerNum)
+        self.checkForWin()
+        if (self.winState != 0):
+            print("A win for player {}".format(self.winState))
+            self.renderBoard()
+
+    def renderBoard(self):
+        print(colours.BLUE+"   ________________"+colours.CLEAR)
+        for rowNum in range(5,-1,-1):
+            print(colours.BOLD+"  "+str(rowNum+1)+colours.CLEAR+colours.BLUE+"|"+colours.CLEAR, end='')
+            for colNum in range(0,7):
+                piece = self.getDisplayPieceAt(rowNum,colNum)
+                print(piece, end='')
+                print(" ", end='')
+            print(colours.BLUE+"|"+colours.CLEAR, flush=True)
+        print(colours.BLUE+"   ================"+colours.CLEAR)
+        print(colours.BOLD+"    1 2 3 4 5 6 7"+colours.CLEAR)
+        print("")
+
+    def getDisplayPieceAt(self, rowNum, colNum):
+        column = self.columns[colNum]
+        # print("rowNum: {}, col: {}".format(rowNum, colNum))
+        # print(len(column))
+        if (len(column)<(rowNum+1)): return colours.UNDERLINE+'_'+colours.CLEAR
+        elif (column[rowNum]==1): return colours.YELLOW+"0"+colours.CLEAR
+        else: return colours.RED+"X"+colours.CLEAR
+
+    def getPlayerPieceAt(self, rowNum, colNum):
+        column = self.columns[colNum]
+        if (len(column)<(rowNum+1)): return 0
+        else: return column[rowNum]
+
+    def getBoardState(self):
+        return self.columns
+
+    def checkForWin(self):
+        # We don't need to test every square, if we proceed from left to right, bottom to top, 
+        #   we only need to check for lines going straight up, lines going up-right, down-right 
+        #   and across-right.  We also don't need to check for right-ward lines in columns 4-6 
+        #   (zero based) and just check for vertical lines in those columns.
+        for rowNum in range(0, 6):
+            for colNum in range(0,7):
+                if (self.checkUpwardsLine(rowNum,colNum)):
+                    print(" Win by upwards line from col: {}, row: {}".format(colNum+1, rowNum+1))
+                    self.winState = self.getPlayerPieceAt(rowNum,colNum)
+                    return self.winState
+                if (self.checkUpRightLine(rowNum,colNum)):
+                    print(" Win by up-right line from col: {}, row: {}".format(colNum+1, rowNum+1))
+                    self.winState = self.getPlayerPieceAt(rowNum,colNum)
+                    return self.winState
+                if (self.checkDownRightLine(rowNum,colNum)):
+                    print(" Win by down-right line from col: {}, row: {}".format(colNum+1, rowNum+1))
+                    self.winState = self.getPlayerPieceAt(rowNum,colNum)
+                    return self.winState
+                if (self.checkHorizontalLine(rowNum,colNum)):
+                    print(" Win by horizontal line from col: {}, row: {}".format(colNum+1, rowNum+1))
+                    self.winState = self.getPlayerPieceAt(rowNum,colNum)
+                    return self.winState
+
+    def checkUpwardsLine(self, rowNum, colNum):
+        if (rowNum>= 3): return False # there isn't enough space for a four line
+        column = self.columns[colNum]
+        if (len(column) != (rowNum+4)): return False # A winning move from this slot will require the column height to be rowNum+4
+        playerNum = self.getPlayerPieceAt(rowNum, colNum)
+        if (playerNum==0): return False
+        for i in range(rowNum+1,rowNum+4):
+            if (column[i]!=playerNum): return False
+        return True;
+    def checkUpRightLine(self, rowNum, colNum):
+        if (rowNum>= 3): return False # there isn't enough space for a four line
+        if (colNum>= 4): return False # there isn't enough space for a four line
+        playerNum = self.getPlayerPieceAt(rowNum, colNum)
+        if (playerNum==0): return False
+        for i in range(1,4):
+            if (self.getPlayerPieceAt(rowNum+i, colNum+i)!=playerNum): return False
+        return True;
+    def checkDownRightLine(self, rowNum, colNum):
+        if (rowNum<= 3): return False # there isn't enough space for a four line
+        if (colNum>= 4): return False # there isn't enough space for a four line
+        playerNum = self.getPlayerPieceAt(rowNum, colNum)
+        if (playerNum==0): return False
+        for i in range(1,4):
+            if (self.getPlayerPieceAt(rowNum-i, colNum+i)!=playerNum): return False
+        return True;
+    def checkHorizontalLine(self, rowNum, colNum):
+        if (colNum>= 4): return False # there isn't enough space for a four line
+        playerNum = self.getPlayerPieceAt(rowNum, colNum)
+        if (playerNum==0): return False
+        for i in range(1,4):
+            if (self.getPlayerPieceAt(rowNum, colNum+i)!=playerNum): return False
+        return True;
