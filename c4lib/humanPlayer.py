@@ -7,14 +7,14 @@ class HumanPlayer(Player):
         # Get our name
         self.name = input("Please enter a name for human player {}: ".format(playerNum))
 
-    def makeMove(self):
+    def chooseMove(self):
         moves = self.board.getLegalMoves()
         moveStr = (',').join([self.__convertZeroBaseToOneBaseString(x) for x in moves])
         move = self.queryMove(moveStr)
         while (not move in moves):
             print(Colours.RED+"That was not a valid column number, please try again.\a"+Colours.CLEAR)
             move = self.queryMove(moveStr)
-        self.board.makeMove(self.playerNum,move)
+        return move
 
     def queryMove(self, moveStr):
         print("\nLegal moves: "+Colours.BOLD+Colours.BLUE+"{}".format(moveStr)+Colours.CLEAR)

@@ -3,11 +3,10 @@ from .player import Player
 
 class RandomBot(Player):
 
-    def makeMove(self):
+    def chooseMove(self):
         moves = self.board.getLegalMoves()
         if (len(moves)==0): raise Exception("We are asked to move but there are no legal moves, perhaps the game has been won or drawn already.")
-        move = randint(0,len(moves)-1)
-        self.board.makeMove(self.playerNum,moves[move])
+        return moves[randint(0,len(moves)-1)]
 
     def getName(self):
         return "RandomBot"

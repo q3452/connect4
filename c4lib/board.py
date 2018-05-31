@@ -19,6 +19,10 @@ class Board:
         self.moveLog = []
     def getMoveNum(self, moveNum):
         return self.moveLog[moveNum]
+    def getLastMoveRowCol(self):
+        col = self.getLastMove()
+        row = len(self.columns[col])-1
+        return (row,col)
     def getLastMove(self):
         if len(self.moveLog)>0:
             return self.moveLog[-1]['colNum']
@@ -59,6 +63,7 @@ class Board:
         else: return Colours.RED+"X"+Colours.CLEAR
 
     def getPlayerPieceAt(self, rowNum, colNum):
+        if(colNum<0 or colNum>6 or rowNum<0 or rowNum>5): return -1
         column = self.columns[colNum]
         if (len(column)<(rowNum+1)): return 0
         else: return column[rowNum]

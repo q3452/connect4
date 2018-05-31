@@ -1,27 +1,28 @@
 #!/usr/bin/env python3
 from c4lib.board import Board
 from c4lib.randomBot import RandomBot
+from c4lib.thinkingBot import ThinkingBot
 from c4lib.humanPlayer import HumanPlayer
 from c4lib.colours import Colours
 
-def getPlayOrder(playerNum):
-    if (playerNum==1): return '1st'
+def getPlayOrder(playerIndex):
+    if (playerIndex==0): return '1st'
     else: return '2nd'
 
 print("\nConnect 4 by Quentin\n")
 # We instantiate the board and then invite players to play on it
 board = Board()
-players = [ RandomBot(1, board), RandomBot(2, board) ]
+players = [ ThinkingBot(1, board, 3), RandomBot(2, board) ]
 
 # The game loop is here, we toggle the active player rather than performing both turns in the same loop
-activePlayer = 1
+playerIndex = 0
 moveNum = 0
 while (board.winState==0):
     board.renderBoard()
-    activePlayer = not activePlayer
-    players[activePlayer].makeMove()
-    print(" Player {} moved in column {}.".format(players[activePlayer].getName(),board.getLastMove()))
+    players[playerIndex].move()
+    print(" Player {} ({}) moved in column {}.".format(players[playerIndex].getName(),getPlayOrder(playerIndex),(board.getLastMove()+1)))
     moveNum = moveNum + 1
+    playerIndex = not playerIndex
 
 board.renderBoard()
 if (board.winState>0):
