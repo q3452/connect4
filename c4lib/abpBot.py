@@ -25,30 +25,25 @@ class ABpBot(Player):
         board = deepcopy(self.board)
         bestMoves = []
         bestUtility = float('-infinity')
-        alpha = float('infinity')
+        alpha = float('-infinity')
         for move in moves:
-            self.debug = (move==3)
             board.makeMove(self.playerNum, move)
-            alpha = -self.alphaBeta(board, float('-infinity'), alpha, self.lookupRange - 1, otherPlayer(self.playerNum))
-            print("Base utility for {} is {}".format(move, alpha))
+            alpha = -self.alphaBeta(board, alpha, float('infinity'), self.lookupRange - 1, otherPlayer(self.playerNum))
             board.unmakeMove()
             if( alpha > bestUtility ):
                 bestUtility = alpha
                 bestMoves = [move]
             elif( alpha == bestUtility ): bestMoves.append(move)
-        print("Best moves:", bestMoves)
         return bestMoves[randint(0,len(bestMoves)-1)]
 
     def alphaBeta(self, board, alpha, beta, lookupRange, playerNum):
-        otherPlayerNum = otherPlayer(playerNum)
-        if (board.winState==otherPlayerNum): return alpha
-
         if lookupRange == 0:
             return self.__applyHeuristics(board, playerNum)
         moves = board.getLegalMoves()
         for move in moves:
             board.makeMove(playerNum, move)
-            utility = -self.alphaBeta(board, -beta, -alpha, lookupRange - 1, otherPlayerNum)
+            if( board.winState == self.playerNum ): utility = float('infinity')
+            else: utility = -self.alphaBeta(board, -beta, -alpha, lookupRange - 1, otherPlayer(playerNum))
             board.unmakeMove()
             if( utility >= beta ):
                 return beta
@@ -73,25 +68,26 @@ class ABpBot(Player):
 
         # We also prefer to move next to an existing piece of ours
         groupingHeuristic = 12 # Count down since this is actually the opponent's move
+        otherPlayerNum = otherPlayer(currentPlayerNum)
         # vertical lines
-        if (boardClone.getPlayerPieceAt(moveRow-1,moveCol) == currentPlayerNum): groupingHeuristic=groupingHeuristic-1
-        if (boardClone.getPlayerPieceAt(moveRow-2,moveCol) == currentPlayerNum): groupingHeuristic=groupingHeuristic-1
+        if (boardClone.getPlayerPieceAt(moveRow-1,moveCol) == otherPlayerNum): groupingHeuristic=groupingHeuristic-1
+        if (boardClone.getPlayerPieceAt(moveRow-2,moveCol) == otherPlayerNum): groupingHeuristic=groupingHeuristic-1
         
         # horizontal lines
-        if (boardClone.getPlayerPieceAt(moveRow,moveCol-1) == currentPlayerNum): groupingHeuristic=groupingHeuristic-1
-        if (boardClone.getPlayerPieceAt(moveRow,moveCol+1) == currentPlayerNum): groupingHeuristic=groupingHeuristic-1
+        if (boardClone.getPlayerPieceAt(moveRow,moveCol-1) == otherPlayerNum): groupingHeuristic=groupingHeuristic-1
+        if (boardClone.getPlayerPieceAt(moveRow,moveCol+1) == otherPlayerNum): groupingHeuristic=groupingHeuristic-1
         
         # ascending lines
-        if (boardClone.getPlayerPieceAt(moveRow-2,moveCol-2) == currentPlayerNum): groupingHeuristic=groupingHeuristic-1
-        if (boardClone.getPlayerPieceAt(moveRow-1,moveCol-1) == currentPlayerNum): groupingHeuristic=groupingHeuristic-1
-        if (boardClone.getPlayerPieceAt(moveRow+1,moveCol+1) == currentPlayerNum): groupingHeuristic=groupingHeuristic-1
-        if (boardClone.getPlayerPieceAt(moveRow+2,moveCol+2) == currentPlayerNum): groupingHeuristic=groupingHeuristic-1
+        if (boardClone.getPlayerPieceAt(moveRow-2,moveCol-2) == otherPlayerNum): groupingHeuristic=groupingHeuristic-1
+        if (boardClone.getPlayerPieceAt(moveRow-1,moveCol-1) == otherPlayerNum): groupingHeuristic=groupingHeuristic-1
+        if (boardClone.getPlayerPieceAt(moveRow+1,moveCol+1) == otherPlayerNum): groupingHeuristic=groupingHeuristic-1
+        if (boardClone.getPlayerPieceAt(moveRow+2,moveCol+2) == otherPlayerNum): groupingHeuristic=groupingHeuristic-1
         
         # descending lines
-        if (boardClone.getPlayerPieceAt(moveRow+2,moveCol-2) == currentPlayerNum): groupingHeuristic=groupingHeuristic-1
-        if (boardClone.getPlayerPieceAt(moveRow+1,moveCol-1) == currentPlayerNum): groupingHeuristic=groupingHeuristic-1
-        if (boardClone.getPlayerPieceAt(moveRow-1,moveCol+1) == currentPlayerNum): groupingHeuristic=groupingHeuristic-1
-        if (boardClone.getPlayerPieceAt(moveRow-2,moveCol+2) == currentPlayerNum): groupingHeuristic=groupingHeuristic-1
+        if (boardClone.getPlayerPieceAt(moveRow+2,moveCol-2) == otherPlayerNum): groupingHeuristic=groupingHeuristic-1
+        if (boardClone.getPlayerPieceAt(moveRow+1,moveCol-1) == otherPlayerNum): groupingHeuristic=groupingHeuristic-1
+        if (boardClone.getPlayerPieceAt(moveRow-1,moveCol+1) == otherPlayerNum): groupingHeuristic=groupingHeuristic-1
+        if (boardClone.getPlayerPieceAt(moveRow-2,moveCol+2) == otherPlayerNum): groupingHeuristic=groupingHeuristic-1
         
         utility = centreHeuristic+groupingHeuristic
         return utility

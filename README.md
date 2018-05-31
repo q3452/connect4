@@ -1,7 +1,7 @@
 # connect4
 A command-line connect4 implementation in Python
 
-This is a Python3 program with no non-standard dependencies (standard dependencies include: random, copy).
+This is a Python3 program with no non-standard dependencies (standard dependencies include: random, copy, time).
 
 Unit testing can be performed using: python3 -m unittest -v test_app.py
 
