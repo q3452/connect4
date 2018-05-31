@@ -6,8 +6,19 @@ def otherPlayer(playerNum):
     newPlayerNum = (not(playerNum-1))+1
     return newPlayerNum
 
+# This is an upgrade to the basic bot which uses a simplified min/max tree.  This uses MinMax with Alpha/Beta Pruning to reduce the search space.
+# This lets this bot look much further ahead than the basic version, up to about 9ply can be searched in reasonable time, compared to about 4 with BasicBot.
+# Various online resources were used for reference and inspiration but mostly the wikipedia on A/B pruning and a relevent stack-exchange question with non-functional code.
+# https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
+# https://stackoverflow.com/questions/19963555/alpha-beta-pruning-python-algorithm
+# 
+# A weakness of the bot is that it assumes that the opponent plays perfectly, which means that in positions where the opponent CAN win, it will assume that it CAN'T 
+# and play randomly from what appear to it to be equally bad options rather than trying to stay alive as long as possible (which would let the opponent make a mistake).
+# This can lead to some counter-intuitive plays which is actually because it knows that it could force a loss if it were on the other side and it considered all defeat 
+# to be equal.  This could probably be fixed by preferring later defeats to immediate ones.
+
 class ABpBot(Player):
-    def __init__(self, playerNum, board, lookupRange = 3):
+    def __init__(self, playerNum, board, lookupRange = 7):
         Player.__init__(self, playerNum, board)
         self.lookupRange = lookupRange
         self.debug = False
@@ -28,7 +39,8 @@ class ABpBot(Player):
         alpha = float('-infinity')
         for move in moves:
             board.makeMove(self.playerNum, move)
-            alpha = -self.alphaBeta(board, alpha, float('infinity'), self.lookupRange - 1, otherPlayer(self.playerNum))
+            if( board.winState == self.playerNum ): alpha = float('infinity')
+            else: alpha = -self.alphaBetaSearch(board, alpha, float('infinity'), self.lookupRange - 1, otherPlayer(self.playerNum))
             board.unmakeMove()
             if( alpha > bestUtility ):
                 bestUtility = alpha
@@ -36,14 +48,14 @@ class ABpBot(Player):
             elif( alpha == bestUtility ): bestMoves.append(move)
         return bestMoves[randint(0,len(bestMoves)-1)]
 
-    def alphaBeta(self, board, alpha, beta, lookupRange, playerNum):
+    def alphaBetaSearch(self, board, alpha, beta, lookupRange, playerNum):
         if lookupRange == 0:
             return self.__applyHeuristics(board, playerNum)
         moves = board.getLegalMoves()
         for move in moves:
             board.makeMove(playerNum, move)
             if( board.winState == self.playerNum ): utility = float('infinity')
-            else: utility = -self.alphaBeta(board, -beta, -alpha, lookupRange - 1, otherPlayer(playerNum))
+            else: utility = -self.alphaBetaSearch(board, -beta, -alpha, lookupRange - 1, otherPlayer(playerNum))
             board.unmakeMove()
             if( utility >= beta ):
                 return beta
@@ -53,7 +65,6 @@ class ABpBot(Player):
 
     # we apply a board-state based heuristic here
     def __applyHeuristics(self, boardClone, currentPlayerNum):
-        if (boardClone.winState == currentPlayerNum): return 999
         if (boardClone.winState == 0): return 0
         # A simple heuristic is to prefer pieces in the centre of the board
         centreHeuristic = 0
@@ -63,10 +74,8 @@ class ABpBot(Player):
                     centreHeuristic = centreHeuristic + 1
 
         (moveRow, moveCol) = boardClone.getLastMoveRowCol();
-        # centreHeuristic = 3-abs(3-moveCol)
-        # if (moveRow == 2 or moveRow == 3): centreHeuristic = centreHeuristic + 1
 
-        # We also prefer to move next to an existing piece of ours
+        # We also prefer to minimise clustering of opponent's pieces, this might encourage our bot to aggressively disrupt opponent's lines
         groupingHeuristic = 12 # Count down since this is actually the opponent's move
         otherPlayerNum = otherPlayer(currentPlayerNum)
         # vertical lines

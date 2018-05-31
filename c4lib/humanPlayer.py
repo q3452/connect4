@@ -19,7 +19,7 @@ class HumanPlayer(Player):
     def queryMove(self, moveStr):
         print("\nLegal moves: "+Colours.BOLD+Colours.BLUE+"{}".format(moveStr)+Colours.CLEAR)
         try:
-            move = int(input("Please choose from the above moves: "))
+            move = int(input("{}: Please choose from the above moves: ".format(self.name)))
             return (move-1) # convert one base to zero base
         except ValueError:
             return -1

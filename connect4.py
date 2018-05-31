@@ -32,7 +32,7 @@ while (board.winState==0):
     startThinking = time.time()
     players[playerIndex].move()
     stopThinking = time.time()
-    print("{:.3g}s Player {} ({}) moved in column {}.".format(stopThinking-startThinking, players[playerIndex].getName(),getPlayOrder(playerIndex),(board.getLastMove()+1)))
+    print(" Player {} ({}) moved in column {} in {:.3g}s.".format(players[playerIndex].getName(),getPlayOrder(playerIndex),(board.getLastMove()+1),stopThinking-startThinking))
     moveNum = moveNum + 1
     playerIndex = not playerIndex
 
