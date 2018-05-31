@@ -6,8 +6,8 @@ from .player import Player
 #   a number larger than 42 is pointless (maximum number of moves) but will not 
 #   actually do much beyond giving you something to do while waiting for the 
 #   heat-death of the universe.  3 or 4 are the practical limits, 2 is quick enough to be comfortable.
-class ThinkingBot(Player):
-    def __init__(self, playerNum, board, lookupRange):
+class BasicBot(Player):
+    def __init__(self, playerNum, board, lookupRange = 3):
         Player.__init__(self, playerNum, board)
         self.lookupRange = lookupRange
 
@@ -108,4 +108,4 @@ class ThinkingBot(Player):
         if (boardClone.getPlayerPieceAt(moveRow-1,moveCol+1) == currentPlayerNum): groupingHeuristic=groupingHeuristic+1
         if (boardClone.getPlayerPieceAt(moveRow-2,moveCol+2) == currentPlayerNum): groupingHeuristic=groupingHeuristic+1
         
-        return (centreHeuristic+groupingHeuristic)/11;
+        return (centreHeuristic+groupingHeuristic)/11

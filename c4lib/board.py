@@ -20,6 +20,7 @@ class Board:
     def getMoveNum(self, moveNum):
         return self.moveLog[moveNum]
     def getLastMoveRowCol(self):
+        if (len(self.moveLog) == 0): raise Exception("Someone is requesting the last move coordinates when there are no moves yet.")
         col = self.getLastMove()
         row = len(self.columns[col])-1
         return (row,col)
@@ -27,10 +28,16 @@ class Board:
         if len(self.moveLog)>0:
             return self.moveLog[-1]['colNum']
         else: raise Exception("Someone is requesting the last move when there are no moves yet.")
+    def unmakeMove(self):
+        if len(self.moveLog) == 0: raise Exception("Someone is requesting to undo the last move when there are no moves yet.")
+        col = self.moveLog[-1]['colNum']
+        del self.columns[col][-1]
+        del self.moveLog[-1]
+        if (self.winState!=0): self.winState = 0 # We can't play after a win so a winning move is always the last move
 
     def makeMove(self, playerNum, colNum):
         if (self.winState != 0): raise ValueError("Player {} is attempting to move when the game is already won by player {}.".format(playerNum, self.winState))
-        if (playerNum != 1 and playerNum != 2): raise ValueError("An invalid player was selected")
+        if (playerNum != 1 and playerNum != 2): raise ValueError("An invalid player was selected ({}).".format(playerNum))
         if (type(colNum) != int): raise ValueError("The board didn't understand the requested move ({}).".format(colNum))
         if (colNum<0 or colNum>6): raise ValueError("An invalid column was requested ({}).".format(colNum))
         if (len(self.columns[colNum])>5): raise ValueError("The move attempted to play in a full column ({}).".format(colNum))

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 from c4lib.board import Board
 from c4lib.randomBot import RandomBot
-from c4lib.thinkingBot import ThinkingBot
+from c4lib.basicBot import BasicBot
+from c4lib.abpBot import ABpBot
 from c4lib.humanPlayer import HumanPlayer
 from c4lib.colours import Colours
 
@@ -12,7 +13,7 @@ def getPlayOrder(playerIndex):
 print("\nConnect 4 by Quentin\n")
 # We instantiate the board and then invite players to play on it
 board = Board()
-players = [ ThinkingBot(1, board, 3), RandomBot(2, board) ]
+players = [ ABpBot(1, board, 7), BasicBot(2, board) ]
 
 # The game loop is here, we toggle the active player rather than performing both turns in the same loop
 playerIndex = 0
